@@ -60,7 +60,7 @@ p > span > .icon.ni { vertical-align: middle; }
 
 .nk-file-desc li { position: relative; padding: 0 .375rem; font-size: 12px; color: #8094ae; }
 
-.nk-file-desc li:not(:first-child):before { content: "î²¡"; font-family: "Nioicon"; position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); font-size: 11px; line-height: 10px; opacity: .8; }
+.nk-file-desc li:not(:first-child):before { content: "·"; font-family: "Nioicon"; position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); font-size: 11px; line-height: 10px; opacity: .8; }
 
 .nk-file-link { text-decoration: none; color: inherit; display: block; }
 

@@ -11,21 +11,9 @@ import vistas.VW_Personal_Usuario;
 public class DTVPersonalUsuario {
 	PoolConexion pc = PoolConexion.getInstance(); 
 	Connection c = null;
-	private ResultSet rsUsuario = null;
 	private ResultSet rs = null;
 	private PreparedStatement ps = null;
 
-	public void LlenarUsuario(Connection c){
-
-		try{
-			ps = c.prepareStatement("select * from vw_personal_usuario", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE, ResultSet.HOLD_CURSORS_OVER_COMMIT);
-			rsUsuario = ps.executeQuery();
-		}
-		catch (Exception e){
-			System.out.println("DATOS: ERROR EN LISTAR EL ID PERSONAL DEL USUARIO "+ e.getMessage());
-			e.printStackTrace();
-		}
-	}
 	
 	public ArrayList<VW_Personal_Usuario> listarIdPersonalUser()
 	{

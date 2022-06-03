@@ -1,7 +1,29 @@
-<div class="app-wrapper-footer mt-5">
+<style>
+
+@media(max-width:992px){
+
+.respon-footer{
+
+
+position:absolute;
+bottom:0; 
+width: 100%;
+}
+.respon-left{
+ 
+
+}
+}
+
+
+</style>
+
+
+
+<div class="app-wrapper-footer mt-5 " >
     <div class="app-footer">
-        <div class="app-footer__inner">
-            <div class="app-footer-left">
+        <div class="app-footer__inner respon-footer">
+            <div class="app-footer-left respon-left">
                 <ul class="nav">
                     <li class="nav-item">
                         <a href="#" class="nav-link">

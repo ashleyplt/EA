@@ -1,3 +1,6 @@
+<%@page import="datos.DTVExpedienteCarrera"%>
+<%@page import="datos.DTAsignatura"%>
+<%@page import="entidades.Asignatura"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
 <!DOCTYPE html>
@@ -38,6 +41,38 @@
 		<div class="app-main">
 			<jsp:include page="./component/movil-menu.jsp"></jsp:include>
 			<jsp:include page="./component/menu.jsp"></jsp:include>
+			<%
+			HttpSession usuario = request.getSession();
+			String cargo = usuario.getAttribute("cargo").toString();
+			
+			int opc = 0;
+			int id = 0;
+			Asignatura a = new Asignatura();
+			String tmp = request.getParameter("opc");
+			
+			if(tmp != null) opc = Integer.parseInt(tmp);
+			if(opc <= 1 || opc > 2 || tmp == null) opc = 1;
+			if(opc == 2) {
+				id = Integer.parseInt(request.getParameter("id"));
+				DTAsignatura dta = new DTAsignatura();
+				a = dta.getAsignaturaPorId(id);
+			}
+			
+			String carrera = "";
+			
+			if(!cargo.equals("")) carrera = session.getAttribute("carrera").toString();
+			
+			DTVExpedienteCarrera dtvec = new DTVExpedienteCarrera();
+			boolean existePlan = dtvec.existeExpedienteEnCarrera(String.valueOf(id), 2, carrera);
+			
+			if(cargo.equals("") || (opc == 2 && !existePlan)){
+			%>
+			<script>
+			window.location.href = "index.jsp";
+			</script>
+			<%
+			}
+			%>
 			<div class="app-main__outer">
 				<div class="app-main__inner">
 					<div class="app-page-title">
@@ -57,32 +92,41 @@
 						<div class="col-md-12">
 							<div class="main-card  card">
 								<div class="card-header">Crear nueva asignatura</div>
-								<form method="post" action="../SLAsignatura" class="needs-validation" novalidate>
+								<form method="post" action="../SLAsignatura?opc=<%=opc%><%if(opc == 2){ %>&id=<%=id%> <%} %>" class="needs-validation" novalidate>
 									<!-- Inicio de campo -->
 									<div class="form-row">
-									<div class="col-md-8 ml-3 mt-2">
+									<div class="col-md-7 ml-3 mt-2">
 										<div class="form-group">
 											<label>Nombre de la nueva asignatura</label>
 											<input type="text"
 												name="nombre" maxlength="50"
-												class="form-control" 
+												class="form-control" <%if(opc == 2){ %> value="<%=a.getNombre() %>" <%} %>
 												id="validationCustomUsername"
 												placeholder="Escriba el nombre" required>
-											<div class="valid-feedback">Validado.</div>
-											<div class="invalid-feedback">Escriba un nombre válido.</div>
+											<div class="invalid-feedback">Escriba el nombre de la asignatura.</div>
 										</div>
 									</div>
 									<!-- Termina de campo -->
-									<div class="col-md mt-2 mr-3">
+									<div class="col-md-3 mt-2">
 										<div class="form-group ">
 											<label>Código de asignatura</label>
 											<input type="text"
 												name="codigo" maxlength="10"
 												class="form-control" style="width: 100%;"
-												id="validationCustomUsername"
+												id="validationCustomUsername" <%if(opc == 2){ %> value="<%=a.getCodigo()%>" <%} %>
 												placeholder="Escriba el código" required>
-											<div class="valid-feedback">Validado.</div>
-											<div class="invalid-feedback">Escriba un nombre válido.</div>
+											<div class="invalid-feedback">Escriba un código no más de 10 caracteres.</div>
+										</div>
+									</div>
+									<div class="col-md mt-2 mr-3">
+										<div class="form-group ">
+											<label>Créditos</label>
+											<input type="number"
+												name="creditos" min="1" max="7" <%if(opc == 2){ %> value="<%=a.getCreditos() %>" <%} %>
+												class="form-control" style="width: 100%;"
+												id="validationCustomUsername"
+												placeholder="No. créditos" required>
+											<div class="invalid-feedback">Ingrese los créditos. Máximo 7.</div>
 										</div>
 									</div>
 									</div>
@@ -93,14 +137,13 @@
 											<input type="text"
 												name="descripcion" maxlength="150"
 												class="form-control" style="width: 100%;"
-												id="validationCustomUsername"
+												id="validationCustomUsername" <%if(opc == 2){ %> value="<%=a.getDescripcion() %>" <%} %>
 												placeholder="Escriba alguna descripción de la asignatura" required>
-											<div class="valid-feedback">Validado.</div>
-											<div class="invalid-feedback">Escriba un nombre válido.</div>
+											<div class="invalid-feedback">Escriba una breve descripción.</div>
 										</div>
 									</div>
 									<div class="d-block text-center card-footer">
-										<button   class="btn-wide btn btn-success" >Guardar</button>
+										<button class="btn-wide btn btn-success" ><%if(opc == 2){ %> Modificar <%} else { %> Guardar <%} %></button>
 									</div>
 								</form>
 							</div>
@@ -126,35 +169,26 @@
 	<script type="text/javascript"
 		src="../dist/plugins/DatePicker/daterangepicker.min.js"></script>
 	<script src="../dist/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
-	
-	<%
-		String opc = request.getParameter("msg");
-		String msg = "";
-		
-		if(opc != null){
-			switch(opc){
-			case "1":
-				msg = "Hubo un error al guardarse.";
-				break;
-			case "2":
-				msg = "Ya existe una asignatura con ese nombre o código.";
-				break;
-			}
+	<% 
+	String error = (String) usuario.getAttribute("error");
+	if(error.equals("")) error = null;
+	if(error !=  null){
 	%>
-	<script>
-	function msg(){
-		Swal.fire({
-			icon: 'error',
-			title: '<%=msg%>',
-			confirmButtonText: 'Aceptar',
-			confirmButtonColor: '#3085d6'
-			})
+
+    <script>
+    Swal.fire({
+		icon: 'error',
+		title: '<%=error%>',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	})
+    </script>
+
+    <%
+	session.setAttribute("error", "");
 	}
-	msg()
-	</script>
-	<%
-		}
 	%>
+	
 	
 	<script>
 	(function() {

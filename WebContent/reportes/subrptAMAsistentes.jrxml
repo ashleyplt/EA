@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subrptAMAsistentes" language="javascript" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c8c718bb-5b50-428b-9b3c-8095f9deee03">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Subreportes"/>
+	<parameter name="id_ayuda_memoria" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT *
+FROM vw_ayuda_memoria_asistentes
+WHERE 
+id_ayuda_memoria =  $P{id_ayuda_memoria}]]>
+	</queryString>
+	<field name="id_ayuda_asistentes" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id_ayuda_asistentes"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_ayuda_asistentes"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="vw_ayuda_memoria_asistentes"/>
+	</field>
+	<field name="id_ayuda_memoria" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id_ayuda_memoria"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_ayuda_memoria"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="vw_ayuda_memoria_asistentes"/>
+	</field>
+	<field name="id_personal" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id_personal"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_personal"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="vw_ayuda_memoria_asistentes"/>
+	</field>
+	<field name="personal" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="personal"/>
+		<property name="com.jaspersoft.studio.field.label" value="personal"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="vw_ayuda_memoria_asistentes"/>
+	</field>
+	<group name="id_ayuda_asistentes">
+		<groupExpression><![CDATA[$F{id_ayuda_asistentes}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="55">
+			<staticText>
+				<reportElement x="10" y="25" width="280" height="30" uuid="f37650ba-225f-4335-9bb4-0d077773a945"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Nombres y apellidos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="25" width="254" height="30" uuid="04865739-3d2c-48c5-9239-9f228b9f7460"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Firma]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement stretchType="ElementGroupHeight" x="10" y="0" width="280" height="40" uuid="93f3951a-8f59-4997-9b68-86412d7d1b83"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{personal}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="ElementGroupHeight" x="290" y="0" width="254" height="40" uuid="3bcb9bbe-bb74-47c9-810d-041ccd1e84c9"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

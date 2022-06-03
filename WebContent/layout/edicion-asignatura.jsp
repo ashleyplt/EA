@@ -1,3 +1,5 @@
+<%@page import="entidades.EdicionAsignatura"%>
+<%@page import="datos.DTEdicionAsignatura"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
 <!DOCTYPE html>
@@ -32,9 +34,21 @@
 <body>
 	<div
 		class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
-
 		<jsp:include page="./component/header.jsp"></jsp:include>
 		<jsp:include page="./component/settings.jsp"></jsp:include>
+		<%
+		HttpSession usuario = request.getSession();
+		String cargo = usuario.getAttribute("cargo").toString();
+		if(cargo.equals("")) cargo = null;
+		if(cargo == null){
+		%>
+		<script>
+		window.location.href = "index.jsp";
+		window.reload
+		</script>
+		<%
+		}
+		%>
 		<div class="app-main">
 			<jsp:include page="./component/movil-menu.jsp"></jsp:include>
 			<jsp:include page="./component/menu.jsp"></jsp:include>
@@ -48,9 +62,7 @@
 									</i>
 								</div>
 								<div>
-								
 									Ediciones de asignatura  
-								
 									<div class="page-title-subheading">Nuevo ciclo académico
 										para nuevas ediciones de asignaturas.</div>
 								</div>
@@ -60,9 +72,13 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div class="main-card  card">
-								<div class="card-header">Crear Edición</div>
-								<form method="post" action="../SLEdicionAsignatura" class="needs-validation" novalidate>
-									<!-- Inicio de campo -->
+								<div class="card-header">Aperturar ediciones de asignatura</div>
+								<%
+									DTEdicionAsignatura dtea = new DTEdicionAsignatura();
+									EdicionAsignatura ea = dtea.getEdicionActiva();
+								%>
+								<form method="post" action="../SLEdicionAsignatura<%if(ea != null)%><%="?id="+ea.getId()%>"<%; %> class="needs-validation" novalidate>
+									
 									<div class="col-md-12 mt-2">
 										<div id="form-group-edicion" class="form-group">
 											<label>Nombre de la nueva edición</label>
@@ -70,9 +86,8 @@
 											<input type="text"
 												name="edicion" maxlength="80"
 												class="form-control" style="width: 100%;"
-												id="validationCustomUsername"
+												id="validationCustomUsername" <%if(ea != null) { %> value="<%=ea.getNombre()%>" <%} %>
 												placeholder="Escriba el nombre" required>
-											<div class="valid-feedback">Validado.</div>
 											<div class="invalid-feedback">Escriba un nombre válido.</div>
 											<div id="check-availability"></div>
 										</div>
@@ -92,13 +107,12 @@
 												<input type="text" class="form-control float-right"
 													type="date" name="daterange" id="drango" required>
 											</div>
-											<div class="valid-feedback">Rango de fecha valido</div>
 											<div class="invalid-feedback">Por favor selecione un
-												rango de fecha valido</div>
+												rango de fecha válido.</div>
 										</div>
 									</div>
 									<div class="d-block text-center card-footer">
-										<button   class="btn-wide btn btn-success" >Guardar</button>
+										<button class="btn-wide btn btn-success" ><%if(ea != null) {%> Modificar <%} else {%> Guardar <%}%></button>
 									</div>
 								</form>
 							</div>
@@ -137,9 +151,9 @@
 	    	        "firstDay": 1
 	    	    },
 	    	    "drops": "up",
-	    	    "startDate": moment(),
-	    	    "endDate": moment().add(5, "days"),
-	    	    "minDate": moment(),
+	    	    "startDate": <%if(ea != null) {%> "<%=ea.getFecha_inicio()%>" <%} else {%> moment() <%}%>,
+	    	    "endDate": <%if(ea != null) {%> "<%=ea.getFecha_cierre()%>" <%} else {%> moment().add(5, "days") <%}%>,
+	    	    "minDate": <%if(ea != null) {%> "<%=ea.getFecha_inicio()%>" <%} else {%> moment() <%}%>,
 	    	    "maxDate": moment().add(6, 'months'),
 	    	    container: '#end',
 	    	    setValue: function(start, end)
@@ -153,45 +167,24 @@
 	    });
     });
 	</script>
-	<%
-		String opc = request.getParameter("msg");
-		String msg = "";
-		String title = "Oops";
-		String icon = "error";
-		
-		if(opc != null){
-			switch(opc){
-			case "1":
-				msg = "Se guardó con éxito";
-				icon = "success";
-				
-				break;
-			case "2":
-				msg = "Hubo un error al guardarse.";
-				break;
-			case "3":
-				msg = "Ya existe una edición con ese nombre.";
-				break;
-			}
+	<% 
+	String error = (String) usuario.getAttribute("error");
+	if(error.equals("")) error = null;
+	if(error !=  null){
 	%>
-	<script>
-	function msg(){
-		Swal.fire({
-			icon: '<%=icon%>',
-			title: '<%=msg%>',
-			confirmButtonText: 'Aceptar',
-			confirmButtonColor: '#3085d6'
-			})
+
+    <script>
+    Swal.fire({
+		icon: 'error',
+		title: '<%=error%>',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	})
+    </script>
+    <%
+	session.setAttribute("error", "");
 	}
-	msg()
-	</script>
-	<%
-		}
 	%>
-	<script>
-		
-		
-		</script>
 	<script>
 	(function() {
 		'use strict'

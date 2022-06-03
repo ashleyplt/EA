@@ -5,20 +5,6 @@
 <%@page import="datos.*"%>
 <%@page import="entidades.*"%>
 
-<%
-ArrayList<Cargo> listcargo = new ArrayList<Cargo>();
-DTCargo cargo = new DTCargo();
-listcargo = cargo.listarCargo();
-
-ArrayList<VW_Coordinacion_Departamento> listCD = new ArrayList<VW_Coordinacion_Departamento>();
-DTVCoordinacionDepartamentos cd = new DTVCoordinacionDepartamentos();
-listCD = cd.listarCoordinacionDepartamentos();
-
-ArrayList<Rol> listRol = new ArrayList<Rol>();
-DTRol rol = new DTRol();
-listRol = rol.listarRol();
-%>
-
 <!DOCTYPE html>
 
 <html lang="es">
@@ -48,7 +34,7 @@ listRol = rol.listarRol();
 
     <!--comentario Font awesome-->
     <link href="../dist/plugins/FontAwesome/css/all.min.css" rel="stylesheet">
-
+	<link rel="stylesheet" href="../dist/plugins/sweetalert2/dist/sweetalert2.min.css">
     
     <!--comentario Estilos Principales-->
     <link href="../dist/main.css" rel="stylesheet">
@@ -62,6 +48,21 @@ listRol = rol.listarRol();
         <!--comentario include de header y settings -->
         <jsp:include page="./component/header.jsp"></jsp:include>
         <jsp:include page="./component/settings.jsp"></jsp:include>
+        
+        <%
+        HttpSession usuario = request.getSession();
+
+        boolean coordinador = false;
+
+		String carrera = "";
+		String cargo = usuario.getAttribute("cargo").toString();
+		if(cargo.equals("")) coordinador = false;
+		else{
+			coordinador = true;
+			carrera = usuario.getAttribute("carrera").toString();
+		}
+		
+        %>
 
         <div class="app-main">
             <!--comentario include de los menus-->
@@ -101,18 +102,13 @@ listRol = rol.listarRol();
                                         </div>
                                     </div>
                                 </div>
-                                <form method="post" action="../SLEnviarCorreo" class="needs-validation" novalidate>
-
-									<input name="opcion" value=1 style="display: none;"> 
-									<input name="id_usuario" value=1 style="display: none;">
-										
+                                <form method="post" action="../SLSolicitudPermiso" class="needs-validation" novalidate>
 									<div class="col-md-12 mt-2">
                                         <div class="form-group">
                                             <label>Asunto</label> 
                                             <input type="text" class="form-control" style="width: 100%;" readonly="readonly"
                                                 name="asunto" value="Solicitud de permiso de acceso a expediente de asignatura." required>
-                                            <div class="valid-feedback"> Nombre válido </div>
-                                            <div class="invalid-feedback"> Por favor ingrese un nombre válido</div>
+                                            
                                         </div>
                                     </div>
                                      <div class="col-md-12">
@@ -121,25 +117,47 @@ listRol = rol.listarRol();
                                             <select class="select2" name="expediente" data-placeholder="Seleccione un expediente" style="width: 100%;" required>
                                                 <option value=""> Selecione un expediente de asignatura</option>
                                                 <%
-                                                DTAsignatura dta = new DTAsignatura();
+                                                String nombre = usuario.getAttribute("nombre_user").toString();
+
+                                        		DTVPersonalUsuario dtvpu = new DTVPersonalUsuario();
+                                        		int idpersonal = dtvpu.buscaridPersonal(nombre);
+                                                
+                                        		DTAsignatura dta = new DTAsignatura();
                                                 ArrayList<Asignatura> listAsignatura = new ArrayList<>();
-                                                listAsignatura = dta.listarAsignaturas();
-												for (Asignatura a : listAsignatura) {
+                                                
+                                                //Verificar si no tiene ya un permiso o asignado a un expediente
+                                                DTVPermisosExpediente dtpe = new DTVPermisosExpediente();
+                                                DTVExpedienteDocente dted = new DTVExpedienteDocente();
+                                                
+                                                if(coordinador){
+                                                	DTVExpedienteCarrera dtvec = new DTVExpedienteCarrera();
+                                                	ArrayList<VW_Expediente_Carrera> listaAsign = dtvec.listarExpedientesNoCarrera(carrera);
+                                                	
+                                                	for(VW_Expediente_Carrera ec : listaAsign){
+                                                		if(!dtpe.existePermiso(ec.getAsignatura(), idpersonal) && !dted.existeDocenteExpediente(ec.getAsignatura(), idpersonal)){
+                                                %>
+                                                <option value="<%=ec.getAsignatura()%>"><%=ec.getAsignatura()%></option>
+                                                <%			
+                                                		}
+                                                	}
+                                                } else {
+	                                                listAsignatura = dta.listarAsignaturas();
+													for (Asignatura a : listAsignatura) {
+														if(!dtpe.existePermiso(a.getNombre(), idpersonal) && !dted.existeDocenteExpediente(a.getNombre(), idpersonal)){
 												%>
-												<option value="<%=a.getId()%>"><%=a.getNombre()%></option>
+												<option value="<%=a.getNombre()%>"><%=a.getNombre()%></option>
 												<%
+														}
+													}
 												}
 												%>
                                                 
                                             </select>
-                                            <div class="valid-feedback">Válido</div>
                                             <div class="invalid-feedback">Por favor selecione una opción.</div>
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleFormControlTextarea1">Motivo</label>
-                                            <textarea name="motivo" class="form-control" id="exampleFormControlTextarea1" rows="4" style="width: 100%;" required>
-                                            </textarea>
-                                            <div class="valid-feedback">Válido</div>
+                                            <textarea name="motivo" class="form-control" id="exampleFormControlTextarea1" rows="4" style="width: 100%;" required></textarea>
                                             <div class="invalid-feedback">Escriba el motivo de la solicitud.</div>
                                         </div>                               
                                     </div>
@@ -166,6 +184,7 @@ listRol = rol.listarRol();
 	<!-- Bootstrap 5 -->
     <script src="../dist/plugins/Bootstrap/js/popper.js"></script>
     <script src="../dist/plugins/Bootstrap/js/bootstrap.min.js"></script>
+    <script src="../dist/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
 
     <!-- Jquery -->
     <script type="text/javascript" src="../dist/plugins/jquery/jquery.min.js"></script>
@@ -180,6 +199,40 @@ listRol = rol.listarRol();
     <!-- script Principal -->
     <script type="text/javascript" src="../dist/assets/scripts/main.js"></script>
 
+	<%  
+	String error = (String) usuario.getAttribute("error");
+	if(error.equals("")) error = null;
+	if(error !=  null){
+		if(error.equals("1")){
+	%>
+    <script>
+    Swal.fire({
+		icon: 'success',
+		title: 'Mensaje enviado.',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	}).then((result) => {
+		if(result.isConfirmed){
+			window.location.href = "index.jsp";
+		}
+	});
+    </script>
+    <%
+		} else {
+	%>	
+	<script>
+    Swal.fire({
+		icon: 'error',
+		title: 'Error al enviar el mensaje.',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	});
+    </script>
+	<%	
+		}
+		session.setAttribute("error", "");
+	}
+	%>
     <script>
         $(function () {
             //Initialize Select2 Elements

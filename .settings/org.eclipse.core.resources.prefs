@@ -1,3 +1,10 @@
 eclipse.preferences.version=1
 encoding//WebContent/dist/main.css=UTF-8
 encoding//WebContent/dist/plugins/file-manager/dashlite.css=UTF-8
+encoding//src/datos/DTActividad.java=UTF-8
+encoding//src/datos/DTModalidadActividad.java=UTF-8
+encoding//src/datos/DTTEActividad.java=UTF-8
+encoding//src/entidades/Actividad.java=UTF-8
+encoding//src/entidades/MaterialActividad.java=UTF-8
+encoding//src/entidades/TipoEvaluacionActividad.java=UTF-8
+encoding//src/vistas/VW_MaterialesActividad.java=UTF-8

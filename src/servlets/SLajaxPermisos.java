@@ -1,5 +1,6 @@
 package servlets;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import datos.DTPersonal;
+import datos.DTUsuario;
 import datos.DTVPermisosExpediente;
 import vistas.VW_Permisos_Expediente;
 
@@ -66,6 +68,16 @@ public class SLajaxPermisos extends HttpServlet {
 				{
 					System.out.println("Correo: " + dtp.getCorreo(vpe.getId_personal()));
 					int id = vpe.getId_personal();
+					DTUsuario dtu = new DTUsuario();
+					String img = dtu.getImagenUsuario(dtp.getIdUsuario(id));
+					String defaultuser = "dist/imagen/user.png";
+					if(img == null) {
+						img = defaultuser;
+					}else {
+						String filename = request.getServletContext().getInitParameter("path");
+						File dir = new File(filename + File.separator + img);
+						if(!dir.exists()) img = defaultuser;
+					}
 					String correo = dtp.getCorreo(id);
 					salida += "<tr>\r\n"
 							+ "							<td>\r\n"
@@ -73,7 +85,7 @@ public class SLajaxPermisos extends HttpServlet {
 							+ "								<div class=\"col-2\">\r\n"
 							+ "									<img width=\"40\"\r\n"
 							+ "									class=\" rounded-circle\"\r\n"
-							+ "									src=\"../dist/assets/images/avatars/1.jpg\" alt=\"\">\r\n"
+							+ "									src=\"../\"+img+\"\" style=\"border-radius: 20px 20px; width: 40px; height: 40px\" alt=\"foto\">\r\n"
 							+ "								</div>\r\n"
 							+ "								<div class=\"col\">\r\n"
 							+ "								<strong>"+vpe.getDocente()+"</strong>\r\n"

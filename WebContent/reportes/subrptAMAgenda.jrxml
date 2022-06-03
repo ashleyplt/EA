@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subrptAMAgenda" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="808560ce-8185-41b9-95f9-97aecd681184">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Subreportes"/>
+	<parameter name="id_ayuda_memoria" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT * FROM AYUDA_MEMORIA_AGENDA 
+WHERE ID_AYUDA_MEMORIA = $P{id_ayuda_memoria}]]>
+	</queryString>
+	<field name="id_ayuda_memoria_agenda" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id_ayuda_memoria_agenda"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_ayuda_memoria_agenda"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="ayuda_memoria_agenda"/>
+	</field>
+	<field name="id_ayuda_memoria" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id_ayuda_memoria"/>
+		<property name="com.jaspersoft.studio.field.label" value="id_ayuda_memoria"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="ayuda_memoria_agenda"/>
+	</field>
+	<field name="agenda" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="agenda"/>
+		<property name="com.jaspersoft.studio.field.label" value="agenda"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="ayuda_memoria_agenda"/>
+	</field>
+	<group name="id_ayuda_memoria_agenda">
+		<groupExpression><![CDATA[$F{id_ayuda_memoria_agenda}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="29" splitType="Stretch">
+			<textField>
+				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="595" height="29" uuid="294c50be-23db-49af-97a4-94534cd539c6"/>
+				<textFieldExpression><![CDATA[$F{agenda}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

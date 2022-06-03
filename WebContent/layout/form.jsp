@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
+    <%@page import="java.util.List"%> 
+<%@page import="java.util.ArrayList"%>
 <!DOCTYPE html>
 
 <html lang="es">
@@ -47,7 +49,7 @@
 
 	<div
 		class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
-
+ 
 		<!--comentario include de header y settings -->
 		<jsp:include page="./component/header.jsp"></jsp:include>
 		<jsp:include page="./component/settings.jsp"></jsp:include>

@@ -6,8 +6,11 @@ public class VW_Cargo_Personal {
 	private String apellido;
 	private String correo;
 	private String telefono;
-	private String lugar;
+	private String coordinacion;
+	private String carrera;
+	private int id_cargo;
 	private String cargo;
+	private int estado;
 	
 	public int getId_personal() {
 		return id_personal;
@@ -39,11 +42,23 @@ public class VW_Cargo_Personal {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
-	public String getLugar() {
-		return lugar;
+	public String getCoordinacion() {
+		return coordinacion;
 	}
-	public void setLugar(String lugar) {
-		this.lugar = lugar;
+	public void setCoordinacion(String coordinacion) {
+		this.coordinacion = coordinacion;
+	}
+	public int getId_cargo() {
+		return id_cargo;
+	}
+	public void setId_cargo(int id_cargo) {
+		this.id_cargo = id_cargo;
+	}
+	public String getCarrera() {
+		return carrera;
+	}
+	public void setCarrera(String carrera) {
+		this.carrera = carrera;
 	}
 	public String getCargo() {
 		return cargo;
@@ -51,5 +66,12 @@ public class VW_Cargo_Personal {
 	public void setCargo(String cargo) {
 		this.cargo = cargo;
 	}
+	public int getEstado() {
+		return estado;
+	}
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
 	
+		
 }

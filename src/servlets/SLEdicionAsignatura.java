@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import datos.DTEdicionAsignatura;
 import entidades.EdicionAsignatura;
@@ -43,6 +44,7 @@ public class SLEdicionAsignatura extends HttpServlet {
 		try 
 		{
 			request.setCharacterEncoding("UTF-8");
+			HttpSession session = request.getSession();
 			DTEdicionAsignatura dte = new DTEdicionAsignatura();
 			EdicionAsignatura ea = new EdicionAsignatura();
 			
@@ -55,31 +57,55 @@ public class SLEdicionAsignatura extends HttpServlet {
 			fecha_inicio = Date.valueOf(rangoFechas[0]);
 			fecha_fin = Date.valueOf(rangoFechas[1]);
 			
-			if(!dte.existeEdicionAsignatura(edicion))
-			{
+			EdicionAsignatura activo = dte.getEdicionActiva();
+			
+			if(activo != null) {
+				ea.setId(Integer.parseInt(request.getParameter("id")));
 				ea.setNombre(edicion);
 				ea.setFecha_inicio(fecha_inicio);
 				ea.setFecha_cierre(fecha_fin);
-				if(dte.guardarEdicion(ea)) {
-					response.sendRedirect("layout/edicion-asignatura.jsp?msg=1");
+				boolean guardar = false;
+
+				if(activo.getNombre().equals(edicion)) {
+					guardar = true;
 				} else {
-					response.sendRedirect("layout/edicion-asignatura.jsp?msg=2");
+					if(!dte.existeEdicionAsignatura(edicion)) {
+						guardar = true;
+					} else {
+						session.setAttribute("error", "Ya existe una edición con ese nombre.");
+						response.sendRedirect("layout/edicion-asignatura.jsp");
+					}
+				}
+				
+				if(guardar) {
+					if(dte.modificarEdicionAsignatura(ea)) {
+						response.sendRedirect("layout/edicion-asignatura.jsp");
+					} else {
+						session.setAttribute("error", "Hubo un error al modificar la edición.");
+						response.sendRedirect("layout/edicion-asignatura.jsp");
+					}
+				}
+			} else {
+				if(!dte.existeEdicionAsignatura(edicion))
+				{
+					ea.setNombre(edicion);
+					ea.setFecha_inicio(fecha_inicio);
+					ea.setFecha_cierre(fecha_fin);
+					if(dte.guardarEdicion(ea)) {
+						response.sendRedirect("layout/edicion-asignatura.jsp");
+					} else {
+						session.setAttribute("error", "Hubo un error al guardarse la edición.");
+						response.sendRedirect("layout/edicion-asignatura.jsp");
+					}
+				}
+				else
+				{
+					session.setAttribute("error", "Ya existe una edición con ese nombre.");
+					response.sendRedirect("layout/edicion-asignatura.jsp");
 				}
 			}
-			else
-			{
-				response.sendRedirect("layout/edicion-asignatura.jsp?msg=3");
-			}
 			
 			
-			/*if(dte.deshabilitarExpediente(codigo, estado))
-			{
-				response.sendRedirect("layout/ver-expediente.jsp?deshabilitado="+estado);
-			}
-			else
-			{
-				response.sendRedirect("layout/ver-expediente.jsp?error");
-			}*/
 		} 
 		catch (Exception e) 
 		{

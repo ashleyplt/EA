@@ -9,6 +9,7 @@ public class Asignatura {
 	private String descripcion;
 	private Date fecha_creacion;
 	private String url_expediente;
+	private int creditos;
 	private int estado;
 	
 	public int getId() {
@@ -47,12 +48,16 @@ public class Asignatura {
 	public void setUrl_expediente(String url_expediente) {
 		this.url_expediente = url_expediente;
 	}
+	public int getCreditos() {
+		return creditos;
+	}
+	public void setCreditos(int creditos) {
+		this.creditos = creditos;
+	}
 	public int getEstado() {
 		return estado;
 	}
 	public void setEstado(int estado) {
 		this.estado = estado;
-	}
-	
-	
+	}	
 }

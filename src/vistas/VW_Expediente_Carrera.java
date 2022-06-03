@@ -9,8 +9,10 @@ public class VW_Expediente_Carrera {
 	private int id_asignatura;
 	private String codigo;
 	private String asignatura;
+	private int creditos;
 	private String url;
 	private String carrera;
+	private int estado;
 	
 	public int getId_plan() {
 		return id_plan;
@@ -48,6 +50,12 @@ public class VW_Expediente_Carrera {
 	public void setAsignatura(String asignatura) {
 		this.asignatura = asignatura;
 	}
+	public int getCreditos() {
+		return creditos;
+	}
+	public void setCreditos(int creditos) {
+		this.creditos = creditos;
+	}
 	public String getUrl() {
 		return url;
 	}
@@ -60,6 +68,11 @@ public class VW_Expediente_Carrera {
 	public void setCarrera(String carrera) {
 		this.carrera = carrera;
 	}
-	
+	public int getEstado() {
+		return estado;
+	}
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
 	
 }

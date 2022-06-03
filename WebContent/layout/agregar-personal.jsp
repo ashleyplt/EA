@@ -10,9 +10,9 @@ ArrayList<Cargo> listcargo = new ArrayList<Cargo>();
 DTCargo cargo = new DTCargo();
 listcargo = cargo.listarCargo();
 
-ArrayList<VW_Coordinacion_Departamento> listCD = new ArrayList<VW_Coordinacion_Departamento>();
-DTVCoordinacionDepartamentos cd = new DTVCoordinacionDepartamentos();
-listCD = cd.listarCoordinacionDepartamentos();
+ArrayList<VW_Coordinacion> listCD = new ArrayList<VW_Coordinacion>();
+DTVCoordinacion cd = new DTVCoordinacion();
+listCD = cd.listarCoordinacion();
 
 ArrayList<Rol> listRol = new ArrayList<Rol>();
 DTRol rol = new DTRol();
@@ -28,7 +28,7 @@ listRol = rol.listarRol();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="es">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Creación de Actividades</title>
+    <title>Agregar Personal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
 
     <!-- <link rel="shortcut icon" href="../dist/img/icono.png">-->
@@ -50,7 +50,7 @@ listRol = rol.listarRol();
     <!--comentario Font awesome-->
     <link href="../dist/plugins/FontAwesome/css/all.min.css" rel="stylesheet">
 
-    
+    <link rel="stylesheet" href="../dist/plugins/sweetalert2/dist/sweetalert2.min.css">
     <!--comentario Estilos Principales-->
     <link href="../dist/main.css" rel="stylesheet">
 </head>
@@ -66,6 +66,17 @@ listRol = rol.listarRol();
         <jsp:include page="./component/header.jsp"></jsp:include>
         <jsp:include page="./component/settings.jsp"></jsp:include>
 
+		<%
+		HttpSession usuario = request.getSession();
+		String roladmin = session.getAttribute("rol").toString();
+		if(roladmin.equals("")){
+		%>
+		<script>
+		window.location.href = "index.jsp";
+		</script>
+		<%
+		}
+		%>
         <div class="app-main">
             <!--comentario include de los menus-->
             <jsp:include page="./component/movil-menu.jsp"></jsp:include>
@@ -83,7 +94,7 @@ listRol = rol.listarRol();
                                     </i>
                                 </div>
                                 <div>Administrar Personal
-                                    <div class="page-title-subheading">Rellene los campos y de click en guardar para agregar un nuevo personal
+                                    <div class="page-title-subheading">Creación de cuenta de un personal.
                                     </div>
                                 </div>
                             </div>
@@ -110,18 +121,18 @@ listRol = rol.listarRol();
 										
 									<div class="col-md-12 mt-2">
                                         <div class="form-group">
-                                            <label>Nombres:</label> 
+                                            <label>Nombres</label> 
                                             <input type="text" class="form-control" style="width: 100%;"
-                                                name="nombre_personal" id="nombre_personal" placeholder="Escriba su nombre completo" required>
-                                            <div class="valid-feedback"> Nombre válido </div>
+                                                name="nombre_personal" id="nombre_personal" placeholder="Escriba su nombre completo" maxlength="60"required>
+                                            
                                             <div class="invalid-feedback"> Por favor ingrese un nombre válido</div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Apellidos:</label> 
+                                            <label>Apellidos</label> 
                                             <input type="text" class="form-control " style="width: 100%;"
-                                                id="apellidos" name="apellidos" placeholder="Escriba su apellido completo" required>
+                                                id="apellidos" name="apellidos" placeholder="Escriba su apellido completo"  maxlength="60" required>
                                             <div class="valid-feedback"> Apellidos válido</div>
                                             <div class="invalid-feedback">
                                                 Por favor ingrese un apellido válido</div>
@@ -129,43 +140,26 @@ listRol = rol.listarRol();
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Correo:</label> 
+                                            <label>Correo</label> 
                                             <input type="email" class="form-control item" style="width: 100%;"
-                                                id="correo" name="correo" placeholder="Escriba su correo electrónico" required>
-                                            <div class="valid-feedback">Correo válido </div>
+                                                id="correo" name="correo" placeholder="Escriba su correo electrónico" maxlength="100"required>
+                                          
                                             <div class="invalid-feedback">Por favor ingrese un correo electrónico válido</div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Telefono</label> 
+                                            <label>Teléfono</label> 
                                             <input type="text" class="form-control mask-tel " style="width: 100%;"
-                                                id="telefono" name="telefono" placeholder="Ingrese su número telefónico" maxlength="14" class="phone_with_ddd" maxlength="14" required>
-                                            <div class="valid-feedback">número válido </div>
+                                                id="telefono" name="telefono" placeholder="Ingrese su número telefónico" maxlength="10" class="phone_with_ddd" maxlength="14" required>
+                                            
                                             <div class="invalid-feedback">Por favor ingrese un número válido</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Lugar:</label>
-                                            <select class="select2" name="lugar" id="lugar" data-placeholder="Seleccione el lugar donde pertenece" style="width: 100%;" required>
-                                                <option value=""> Selecione al menos uno</option>
-                                                <%
-													for (VW_Coordinacion_Departamento CD : listCD) {
-												%>
-												<option value="<%=CD.getNombre()%>"><%=CD.getNombre()%></option>
-												<%
-													}
-												%>
-                                            </select>
-                                            <div class="valid-feedback">Válido</div>
-                                            <div class="invalid-feedback">Por favor selecione una opción</div>
                                         </div>
                                     </div>
                                      <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Cargo:</label>
-                                            <select class="select2" name="cargo" id="cargo"  data-placeholder="Seleccione su cargo" style="width: 100%;" required>
+                                            <label>Cargo</label>
+                                            <select class="select2" name="cargo" id="cargo" multiple="multiple" data-placeholder="Seleccione su cargo" style="width: 100%;" required>
                                                 <option value=""> Selecione al menos uno</option>
                                                 <%
 													for (Cargo c : listcargo) {
@@ -176,18 +170,35 @@ listRol = rol.listarRol();
 												%>
                                                 
                                             </select>
-                                            <div class="valid-feedback">Válido</div>
                                             <div class="invalid-feedback">Por favor selecione una opción</div>
                                         </div>
+                                     </div>
+                                     <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Coordinación</label>
+                                            <select class="select2" name="lugar" id="lugar" multiple="multiple" data-placeholder="Seleccione la coordinación donde pertenece" style="width: 100%;" required>
+                                                <option value=""> Selecione al menos uno</option>
+                                                <%
+                                                	for (VW_Coordinacion CD : listCD) {
+                                                %>
+												<option value="<%=CD.getId()%>"><%=CD.getNombre()%></option>
+												<%
+													}
+												%>
+                                            </select>
+                                            <div class="invalid-feedback">Por favor selecione una opción</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
                                        <div class="form-group">
-                                            <label>Usuario: </label> 
+                                            <label>Usuario</label> 
                                             <input type="text" class="form-control " style="width: 100%;"
                                                 id="usuario" name="usuario" placeholder="Escriba un nombre de usuario con un minimo de 6 carácteres" minlength="6" maxlength="18"required>
                                             <div class="valid-feedback">Usuario válido </div>
                                             <div class="invalid-feedback">Por favor ingrese un usuario válido</div>
                                         </div>
                                         <div class="form-group">
-                                            <label>Rol:</label>
+                                            <label>Rol en el sistema</label>
                                             <select class="select2" multiple="multiple" name="rol" id="rol"  data-placeholder="Seleccione un rol" style="width: 100%;" required>
                                                 <option value=""> Selecione al menos uno</option>
                                                  <%
@@ -198,15 +209,7 @@ listRol = rol.listarRol();
 													}
 												%>
                                             </select>
-                                            <div class="valid-feedback">Válido</div>
                                             <div class="invalid-feedback">Por favor selecione una opción</div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Contraseña: </label> 
-                                            <input type="password" class="form-control " style="width: 100%;"
-                                                id="contraseña" name="contraseña" placeholder="Escriba su contraseña con un minimo de 8 carácteres" minlength="8" maxlength="25"required>
-                                            <div class="valid-feedback">Contraseña válido </div>
-                                            <div class="invalid-feedback">Por favor ingrese una contraseña válida</div>
                                         </div>
                                     </div>
 									<div class="d-block text-center card-footer">
@@ -249,35 +252,120 @@ listRol = rol.listarRol();
     <!-- script Principal -->
     <script type="text/javascript" src="../dist/assets/scripts/main.js"></script>
 
+	<script src="../dist/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
     <script>
         $(function () {
             //Initialize Select2 Elements
-            $('.select2').select2()
+            $('.select2').select2();
             //Initialize Select2 Elements
             $('.select2bs4').select2({
                 theme: 'bootstrap4'
             })
         })
     </script>
+    <% 
+    String error = usuario.getAttribute("error").toString();
+	if(error.equals("")) error = null;
+	if(error != null){
+		if(error.equals("0")){
+	%>
+	<script>
+	Swal.fire({
+		icon: 'success',
+		title: 'Se ha enviado un correo de verificación al correo electrónico.',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	}).then((result) => {
+		if(result.isConfirmed){
+			window.location.href = "index.jsp";
+		}
+	})
+	</script>
+	<%	
+		} else {
+	%>
+	<script>
+	Swal.fire({
+		icon: 'error',
+		title: '<%=error%>',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+		})
+	</script>
+	<%
+		}
+		usuario.setAttribute("error", "");
+	}
+	
+	%>
 
  <!--Validacion del formulario-->
     <script>
-            (function () {
-                'use strict'
-                //id del formulario
-                var forms = document.querySelectorAll('.needs-validation')
-                // validacion al intentar enviar datos
-                Array.prototype.slice.call(forms)
-                    .forEach(function (form) {
-                        form.addEventListener('submit', function (event) {
-                            if (!form.checkValidity()) {
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }
-                            form.classList.add('was-validated')
-                        }, false)
-                    })
-            })()
+     (function () {
+         'use strict'
+         //id del formulario
+         var forms = document.querySelectorAll('.needs-validation')
+         // validacion al intentar enviar datos
+         Array.prototype.slice.call(forms)
+             .forEach(function (form) {
+                 form.addEventListener('submit', function (event) {
+                     if (!form.checkValidity()) {
+                         event.preventDefault()
+                         event.stopPropagation()
+                     }
+                     form.classList.add('was-validated')
+                 }, false)
+             })
+     })()
+    </script>
+    <script>
+    $(document).ready(function() {
+        $('#cargo').change(function() {
+            var selected = $("#cargo").val();
+            
+            if($("#cargo option[value=1]:selected").length > 0){
+            	if($("#lugar :selected").length > 1){
+            		$("#lugar").val([]);
+            	}
+            	if($("#cargo :selected").length > 1){
+            		$("#cargo").val([]);
+            		$("#lugar").select2({
+                		maximumSelectionLength: 1,
+                		language: {
+                			maximumSelected: function(e){
+                				var t = "Solo puede seleccionar " + e.maximum + " coordinación.";
+                				e.maximum != 1 && (t += "s");
+                				return t;
+                			}
+                		}
+                	});
+            	} else {
+	            	$("#lugar").select2({
+	            		maximumSelectionLength: 5,
+	            		language: {
+	            			maximumSelected: function(e){
+	            				var t = "Solo puede seleccionar " + e.maximum + " coordinación.";
+	            				e.maximum != 1 && (t += "s");
+	            				return t;
+	            			}
+	            		}
+	            	});
+            	}
+            } else {
+            	$("#lugar").select2({
+            		maximumSelectionLength: 1,
+            		language: {
+            			maximumSelected: function(e){
+            				var t = "Solo puede seleccionar " + e.maximum + " coordinación.";
+            				e.maximum != 1 && (t += "s");
+            				return t;
+            			}
+            		}
+            	});
+            }
+        });
+    });
+    
     </script>
     
 </body>

@@ -1,13 +1,11 @@
-<%@page import="vistas.VW_Expediente_Carrera"%>
-<%@page import="datos.DTVExpedienteCarrera"%>
-<%@page import="datos.DTVPermisosExpediente"%>
-<%@page import="vistas.VW_Permisos_Expediente"%>
-<%@page import="datos.DTVPersonalUsuario"%>
-<%@page import="vistas.VW_Cargo_Personal"%>
-<%@page import="datos.DTVCargoPersonal"%>
-<%@page import="vistas.VW_Expediente_Docente"%>
+<%@page import="java.time.temporal.ChronoUnit"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.sql.Date"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="entidades.EdicionAsignatura"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="datos.DTVExpedienteDocente"%>
+<%@page import="vistas.*"%>
+<%@page import="datos.*"%>
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
 <!DOCTYPE html>
@@ -19,7 +17,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Language" content="es">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Área personal</title>
+<title>Expediente de asignatura</title>
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
 
@@ -69,7 +67,7 @@
 		<jsp:include page="./component/header.jsp"></jsp:include>
 		<jsp:include page="./component/settings.jsp"></jsp:include>
 		<%
-			HttpSession usuario = request.getSession();
+		HttpSession usuario = request.getSession();
 		String nombre = usuario.getAttribute("nombre_user").toString();
 
 		boolean coordinador = false;
@@ -82,13 +80,10 @@
 		DTVCargoPersonal dtvCP = new DTVCargoPersonal();
 		ArrayList<VW_Cargo_Personal> listaCP = dtvCP.buscarCargoPersonal(id);
 
-		for (VW_Cargo_Personal cp : listaCP) {
-			System.out.println(cp.getNombre() + " " + cp.getApellido());
-			if (cp.getCargo().equals("Coordinador")) {
-				coordinador = true;
-				carrera = cp.getLugar();
-			}
-		}
+		String cargo = usuario.getAttribute("cargo").toString();
+		carrera = usuario.getAttribute("carrera").toString();
+		if(cargo.equals("")) coordinador = false;
+		else coordinador = true;
 		%>
 		<div class="app-main">
 			<!--comentario include de los menus-->
@@ -103,18 +98,17 @@
 							<!--comentario inicia la card debajo del header-->
 							<div class="page-title-heading">
 								<div class="page-title-icon">
-									<i class="fas fa-user icon-gradient bg-mean-fruit"> </i>
+									<i class="fas fa-house-user icon-gradient bg-sunny-morning"> </i>
 								</div>
 								<div>
-									Área Personal
-									<div class="page-title-subheading">Esta es mi Área
-										personal</div>
+									Sistema de gestión de expedientes de asignaturas
+									<div class="page-title-subheading">Universidad Centroamericana</div>
 								</div>
 							</div>
 						</div>
 					</div>
 					<%
-						DTVExpedienteCarrera dtve = new DTVExpedienteCarrera();
+					DTVExpedienteCarrera dtve = new DTVExpedienteCarrera();
 					ArrayList<VW_Expediente_Carrera> listaExpedienteCarrera = new ArrayList<>();
 
 					ArrayList<VW_Expediente_Docente> listarExpedientes = new ArrayList<>();
@@ -123,15 +117,118 @@
 					DTVPermisosExpediente dtpe = new DTVPermisosExpediente();
 					ArrayList<VW_Permisos_Expediente> listarPermisosExpedientes = new ArrayList<>();
 
+					DTEdicionAsignatura dtea = new DTEdicionAsignatura();
+					EdicionAsignatura ea = null;
+					
+					boolean expedientedoc = false;
+					
+					Calendar cal = Calendar.getInstance();
+					
+					Date cierre = null;
+					Date actual = null;
+					
 					if (coordinador) {
 						listaExpedienteCarrera = dtve.listarExpedientesCarrera(carrera);
 						listarExpedientes = dte.listarExpediente();
+						
+						ArrayList<VW_Expediente_Docente> tmpList = dte.listarExpedienteSegunDocente(id);
+						if(tmpList.size() != 0) expedientedoc = true;
+						
 						listarPermisosExpedientes = dtpe.listarPermisosExpediente();
 					} else {
 						listarExpedientes = dte.listarExpedienteSegunDocente(id);
+						if(listarExpedientes.size() != 0) expedientedoc = true;
+						ea = dtea.getEdicionActiva();
 					}
+					
+					if(ea != null){
+						cal.setTime(ea.getFecha_cierre());
+						cal.add(Calendar.DATE, -7);
+						cierre = new Date(cal.getTime().getTime());
+						actual = new Date(Calendar.getInstance().getTime().getTime());
+					}
+					
+					%>
+					<!-- Carrusel -->
+					<div class=" container mb-5">
+						<div id="carouselExampleCaptions" class="carousel slide"
+							data-bs-ride="carousel">
+							<div class="carousel-indicators">
+								<button type="button" data-bs-target="#carouselExampleCaptions"
+									data-bs-slide-to="0" class="active" aria-current="true"
+									aria-label="Slide 1"></button>
+								<button type="button" data-bs-target="#carouselExampleCaptions"
+									data-bs-slide-to="1" aria-label="Slide 2"></button>
+								<%
+								if(expedientedoc){
+									if(actual.toString().equals(ea.getFecha_cierre().toString()) || actual.after(cierre)){
+									
+								%>
+								<button type="button" data-bs-target="#carouselExampleCaptions"
+									data-bs-slide-to="2" aria-label="Slide 3"></button>
+								<%
+									}
+								}
+								%>
+							</div>
+							<div class="carousel-inner">
+							<%
+							
+								if(expedientedoc){
+									if(actual.toString().equals(ea.getFecha_cierre().toString()) || actual.after(cierre)){
+										int milisecondsByDay = 86400000;
+										int dias = (int) Math.round((ea.getFecha_cierre().getTime() - actual.getTime()) / (double) 86400000);
+										SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+										
+							%>
+								<div class="carousel-item active">
+									<img
+										src="../dist/imagen/recordatorio.png"
+										class="d-block w-100" alt="...">
+									<div class="carousel-caption d-none d-md-block">
+										<h5><%=sdf.format(ea.getFecha_cierre())%></h5>
+										<p>
+										<% if(dias == 0) { %>
+										Hoy es el último día. <%} else { %> Faltan <%=dias%> días. <%} %> </p>
+									</div>
+								</div>
+							<%
+									}
+							} 
+							%>
+								<div class="carousel-item <% if(!expedientedoc){%> active <%}%>">
+									<img
+										src="../dist/imagen/bienvenido.png"
+										class="d-block w-100" alt="...">
+									<div class="carousel-caption d-none d-md-block">
+									</div>
+								</div>
+								<div class="carousel-item">
+									<img
+										src="../dist/imagen/contactanos.png"
+										class="d-block w-100" alt="...">
+									<div class="carousel-caption d-none d-md-block">
+									</div>
+								</div>
+								
+							</div>
+							<button class="carousel-control-prev" type="button"
+								data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Anterior</span>
+							</button>
+							<button class="carousel-control-next" type="button"
+								data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Siguiente</span>
+							</button>
+						</div> <!-- carrusel -->
+					</div>
+					<%
+					DTEdicionAsignatura dteda = new DTEdicionAsignatura();
+					EdicionAsignatura eda = dteda.getEdicionActiva();
+					
 					//Lista de expediente según el docente
-
 					if (listarExpedientes.size() != 0 || listaExpedienteCarrera.size() != 0) {
 						accesoExpedientes = true;
 					%>
@@ -140,40 +237,41 @@
 							<div class="main-card mb-3 card">
 								<div class="card-header">
 									Vista general de expedientes
+									<%if(coordinador && eda == null){%>
+									<i class="ml-2 icon ni fas fa-question-circle" id="popover" data-trigger="hover" data-container="body" data-toggle="popover" data-placement="right" data-content="Para poder asignar docentes a un expediente de asignatura debe primero aperturar una nueva edición." style="cursor:pointer;"></i> 
+									<%
+									}
+									if(coordinador){
+									%>
 									<div class="btn-actions-pane-right">
 										<div role="group" class="btn-group-sm btn-group">
 											<div class="page-title-actions">
-												<div class=" dropdown">
-													<button type="button" data-toggle="dropdown"
+												<%
+													if(eda == null){
+												%>
+													<button type="button" onclick="nuevoCiclo()"
 														aria-haspopup="true" aria-expanded="false"
-														class="btn-shadow dropdown-toggle btn btn-info">
+														class="btn-shadow btn" style="background-color:#3f6ad8; color: white;">
 														<span class="btn-icon-wrapper pr-2 opacity-7"> <i
-															class="fa fa-cog fa-w-20"></i>
-														</span> Opciones
+															class="fa fa-plus fa-w-20"></i>
+														</span>
+														Aperturar edición para asignaturas
 													</button>
-													<div tabindex="-1" role="menu" aria-hidden="true"
-														class="dropdown-menu dropdown-menu-right">
-														<ul class="nav flex-column">
-															<li class="nav-item"><a
-																href="edicion-asignatura.jsp" class="nav-link"> <i
-																	class="nav-link-icon lnr-inbox"></i> <span>
-																		Nuevo ciclo académico </span>
-															</a></li>
-															<li class="nav-item"><a href="#" class="nav-link">
-																	<i class="nav-link-icon lnr-book"></i> <span>
-																		Buscar Expediente </span>
-															</a></li>
-															<li class="nav-item"><a href="#"
-																class="nav-link disabled"> <i class="nav-link-icon"></i>
-																	<span> Otra Opcion </span>
-															</a></li>
-
-														</ul>
-													</div>
-												</div>
+												<%
+													}
+													else {
+												%>
+										<p class="text-muted text-capitalize font-weight-normal">Edición: <%=eda.getNombre()%></>
+										<span onclick="location.href='edicion-asignatura.jsp'" title="Editar edición" class="btn-icon-wrapper mr-2 ml-1 opacity-7"> <i
+											class="fa fa-edit" style="color:#3f6ad8; cursor:pointer;"></i>
+										</span>
+												<%		
+													}
+												%>
 											</div>
 										</div>
 									</div>
+								<%} %>
 								</div>
 								<div class="card-body">
 									<div class="tab-content">
@@ -239,8 +337,7 @@
 																		</div>
 																		<div class="nk-file-name">
 																			<div class="nk-file-name-text">
-																				<a
-																					href="edicion-asignatura.jsp?expediente=<%=expediente%>"
+																				<a href="expediente-asignatura.jsp?expediente=<%=expediente%>"
 																					class="title"><%=expediente%></a>
 																				<div class="asterisk">
 																					<a href="#"><em
@@ -256,7 +353,7 @@
 																			for (VW_Expediente_Docente e : listarExpedientes) {
 																				if (expediente.equals(e.getAsignatura())) {
 																		%>
-																		<li class="date" style="list-style: none;"><%=e.getDocente()%><br></li>
+																		<li class="date" style="list-style: none; " class="siu"><%=e.getDocente()%></li>                                       
 																		<%
 																			}
 																		}
@@ -272,20 +369,12 @@
 																		<div class="dropdown-menu dropdown-menu-right">
 																			<ul style="list-style: none;"
 																				class="link-list-plain no-bdr">
-																				<li><a href="#"
-																					data-toggle="modal"> <em
-																						class="icon ni fas fa-ban"></em> <span>Deshabilitar</span>
-																				</a></li>
 																				<li><a href="#" onclick="vercompartidos('<%=expediente%>')" data-target="#myModal"><em
-																					class="icon ni fas fa-user-plus"></em><span>Compartir</span></a>
-																				<li><a href="#" data-toggle="modal" data-target="#myModal"><em
-																						class="icon ni ni-copy"></em><span>Compartir 2</span></a></li>
-																				<li><a href="#file-move" data-toggle="modal"><em
-																						class="icon ni ni-forward-arrow"></em><span>Move</span></a>
-																				</li>
-																				<li><a href="#" class="file-dl-toast"><em
-																						class="icon ni ni-download"></em><span>Downloads</span></a>
-																				</li>
+																					class="icon ni fas fa-users"></em><span>Compartir</span></a>
+																				<%if(eda != null){ %>
+																				<li><a href="#" data-toggle="modal" onclick="verdocentes('<%=expediente%>')" data-target="#modalDocente"><em
+																						class="icon ni fas fa-user-plus"></em><span>Asignar docentes</span></a></li>
+																				<%} %>
 																			</ul>
 																		</div>
 																	</div>
@@ -327,35 +416,6 @@
 								<!-- INICIA EL DE LOS PERMISOS -->
 								<div class="card-header">
 									Accesos a otros expedientes
-									<div class="btn-actions-pane-right">
-										<div role="group" class="btn-group-sm btn-group">
-											<div class="page-title-actions">
-												<div class=" dropdown">
-													<button type="button" data-toggle="dropdown"
-														aria-haspopup="true" aria-expanded="false"
-														class="btn-shadow dropdown-toggle btn btn-info">
-														<span class="btn-icon-wrapper pr-2 opacity-7"> <i
-															class="fa fa-cog fa-w-20"></i>
-														</span> Opciones
-													</button>
-													<div tabindex="-1" role="menu" aria-hidden="true"
-														class="dropdown-menu dropdown-menu-right">
-														<ul class="nav flex-column">
-															<li class="nav-item"><a href="#" class="nav-link">
-																	<i class="nav-link-icon lnr-book"></i> <span>
-																		Buscar Expediente </span>
-															</a></li>
-															<li class="nav-item"><a href="#"
-																class="nav-link disabled"> <i class="nav-link-icon"></i>
-																	<span> Otra Opcion </span>
-															</a></li>
-
-														</ul>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
 								</div>
 								<div class="card-body">
 									<!-- termina -->
@@ -395,7 +455,7 @@
 																		</div>
 																		<div class="nk-file-name">
 																			<div class="nk-file-name-text">
-																				<a href="edicion-asignatura.jsp" class="title"><%=pe.getAsignatura()%></a>
+																				<a href="expediente-asignatura.jsp?expediente=<%=pe.getAsignatura()%>" class="title"><%=pe.getAsignatura()%></a>
 																				<div class="asterisk">
 																					<a href="#"><em
 																						class="asterisk-off icon ni ni-star"></em><em
@@ -477,6 +537,29 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="modal fade" id="modalDocente" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabelDoc"></h4>
+					<button type="button" onclick="closemodal()" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div id="docente-content" class="modal-body">							
+						
+				</div>
+				<div class="modal-footer">
+					<button type="button" onclick="closemodal()"class="btn btn-default" data-dismiss="modal">Cerrar</button>
+					<button type="button" onclick="nuevodocente()"
+					class="btn btn-primary">Asignar nuevo docente</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- Bootstrap 5 -->
 	<script src="../dist/plugins/Bootstrap/js/popper.js"></script>
 	<script src="../dist/plugins/Bootstrap/js/bootstrap.min.js"></script>
@@ -511,9 +594,28 @@
 	<script type="text/javascript" src="../dist/assets/scripts/main.js"></script>
 	
 	<script src="../dist/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+	<%  
+	String error = (String) usuario.getAttribute("error");
+	if(error.equals("")) error = null;
+	if(error !=  null){
+	%>
 
+    <script>
+    Swal.fire({
+		icon: 'error',
+		title: '<%=error%>',
+		confirmButtonText: 'Aceptar',
+		confirmButtonColor: '#3085d6'
+	})
+    </script>
+    <%
+	session.setAttribute("error", "");
+	}
+	%>
 	<script>
+	var exp;
 	function vercompartidos(expediente){
+		exp = expediente;
 		 $.ajax({		    
 	          url: "../SLajaxPermisos",
 	          type: "post",
@@ -528,11 +630,33 @@
 	        }); 
 	}
 	
+	function verdocentes(expediente){
+		exp = expediente;
+		 $.ajax({		    
+	          url: "../SLajaxDocentesExp",
+	          type: "post",
+	          datatype:"html",
+	          data: {'expediente':expediente},
+	          success: function(data) 
+	          {
+	        		$('#docente-content').html(data);
+	        		document.getElementById('myModalLabelDoc').innerHTML = expediente;
+	        		$('#modalDocente').modal("show");
+	          }
+	        }); 
+	}
+	
 	function closemodal(){
 		$('#myModal').modal('hide');
+		$('#modalDocente').modal('hide');
 	}
 	
 	function optionsmodal(id, opcion){
+		var url = "permisos-expediente.jsp";
+		if(opcion == 1){
+			window.location.href=url+"?opc=3&id="+id;
+			location.reload
+		}
 		if(opcion == 2){
 			Swal.fire({
 				confirmButtonColor: '#3085d6',
@@ -542,17 +666,38 @@
 				  cancelButtonText: 'Cancelar',
 				  confirmButtonText: 'Aceptar'
 				}).then((result) => {
-				  /* Read more about isConfirmed, isDenied below */
+				  
 				  if (result.isConfirmed) {
-				    Swal.fire('Saved!', '', 'success')
-				  } else if (result.isDenied) {
-				    Swal.fire('Changes are not saved', '', 'info')
+					  window.location.href="../SLPermisosAsignatura?opc=3&idpermiso="+id;
+					  location.reload
 				  }
 				})
-		} else {
-			window.location.href="edicion-asignatura.jsp?probando";
+		} 
+		if(opcion == 3){
+			window.location.href=url+"?opc=1&expediente="+exp;
 			location.reload
 		}
+	}
+	
+	function quitardocente(id){
+		Swal.fire({
+			confirmButtonColor: '#3085d6',
+			  title: '¿Está seguro que quiere quitar al docente del expediente?',
+			  showCloseButton: true,
+			  showCancelButton: true,
+			  cancelButtonText: 'Cancelar',
+			  confirmButtonText: 'Aceptar'
+			}).then((result) => {
+			  if (result.isConfirmed) {
+				  window.location.href="../SLExpedienteDocente?id="+id;
+				  location.reload
+			  }
+			});
+	}
+	
+	function nuevodocente(){
+		window.location.href="docente-expediente.jsp?expediente="+exp;
+		location.reload
 	}
 	
 	function gotopage(opcion, expediente){
@@ -560,10 +705,10 @@
 		window.location.href="edicion-asignatura.jsp";
 			
 		if(opcion == 1){
-			window.location.href=url+"?expediente="+document.getElementById('myModalLabel').getAttribute('value');
+			window.location.href=url+"?opc="+opcion+"&expediente="+exp;
 			location.reload
 		} else {
-			window.location.href=url+"?opc="+opcion+"?id="+expediente;
+			window.location.href=url+"?opc="+opcion+"&id="+expediente;
 		}
 	}
 	</script>
@@ -603,6 +748,8 @@
 			window.location.href="edicion-asignatura.jsp";
 			location.reload
 		}
+
+		$("#oculto-div").addClass("d-block");
 	</script>
 </body>
 </html>

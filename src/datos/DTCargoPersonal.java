@@ -77,7 +77,7 @@ public class DTCargoPersonal {
 			c = PoolConexion.getConnection();
 			this.llenarCargoPersonal(c);
 			rsCp.moveToInsertRow();
-			rsCp.updateInt("estado", cp.getEstado());
+			rsCp.updateInt("estado", 1);
 			rsCp.updateInt("id_cargo", cp.getId_cargo());
 			rsCp.updateInt("id_personal", cp.getId_personal());
 			rsCp.insertRow();
@@ -136,6 +136,40 @@ public class DTCargoPersonal {
 
 		}
 		return id;
+	}
+	
+	public CargoPersonal getPersonalInfo(int id) {
+		CargoPersonal cp = new CargoPersonal();
+		try {
+			c = PoolConexion.getConnection();
+			ps = c.prepareStatement("select * from personal where id_personal = ?;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE,
+					ResultSet.HOLD_CURSORS_OVER_COMMIT);
+			ps.setInt(1, id);
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				id = rs.getInt("id_personal");
+			}
+		} catch (Exception e) {
+			System.out.println("DATOS: ERROR EN BUSCAR ID PERSONAL" + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (ps != null) {
+					ps.close();
+				}
+				if (c != null) {
+					PoolConexion.closeConnection(c);
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		return cp;
 	}
 
 }

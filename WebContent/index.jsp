@@ -12,7 +12,7 @@
 <meta name="author" content="" />
 <meta charset="ISO-8859-1">
 <link rel="shortcut icon" href="dist/img/icono.png">
-<title>Moonix login</title>
+<title>Iniciar Sesión</title>
 
 <!--comentario Estilos de bootstrap 5 -->
 <link rel="stylesheet" href="./dist/plugins/Bootstrap/css/bootstrap.min.css">
@@ -20,7 +20,10 @@
 <script src="./dist/plugins/Bootstrap/js/popper.js"></script>
 <script src="./dist/plugins/Bootstrap/js/bootstrap.min.js"></script>
 
+<link rel="stylesheet" href="./dist/sweetalert2.min.css">
 <link href="./dist/css/login.css" rel="stylesheet">
+
+<script src="./dist/sweetalert2.all.min.js"></script>
 
 
 </head>
@@ -37,46 +40,49 @@
 	} else {
 	%>
 	<script>
-		function redireccionar(){ 
-			window.location.href="./layout/";
-		}
-		redireccionar()
+		//function redireccionar(){ 
+			//window.location.href="./layout/";
+		//}
+		//redireccionar()
+		Swal.fire({
+  title: '¡Ya hay una sesión activa!',
+  text: "¿Desea continuar como <%=nombre%>?",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Continuar sesión'
+}).then((result) => {
+  if (result.isConfirmed) {
+	  window.location.href="./layout/";
+  }else{
+
+	  window.location.href="./SLLogin?session=1";
+  }
+})
 	</script>
 	<% 
 	}
 	
-if(error ==  "no entraste"){
-	  
+	if(error ==  "no entraste"){
+	%>
+
+    <script>
+        Swal.fire({
+        	title: 'Usuario o contraseña incorrecta.',
+            icon:'error'
+        })
+    </script>
+
+    <%
 	session.setAttribute("error", "");
 	%>
  <!-- aqui -->
  
- <div class="modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-	<script>
-	$('#myModal').modal('show')
-	</script>
-	 
 	<%  
 	}
 	%>
+	
 	<div class="container">
 
 
@@ -109,8 +115,7 @@ if(error ==  "no entraste"){
 										<div class="form-group">
 											<div class="custom-control custom-checkbox small">
 												<input type="checkbox" class="custom-control-input"
-													id="customCheck"> <label
-													class="custom-control-label" for="customCheck">Recuérdame</label>
+													id="customCheck" name="recuerdame"> 
 											</div>
 										</div>
 										<input type="submit"
@@ -119,7 +124,7 @@ if(error ==  "no entraste"){
 									</form>
 									<hr>
 									<div class="text-center">
-										<a class="small" href="forgot-password.jsp">¿Olvidaste tu
+										<a class="small" href="layout/forgot-password.jsp">¿Olvidaste tu
 											contraseña?</a>
 									</div>
 
@@ -138,4 +143,4 @@ if(error ==  "no entraste"){
 	<!-- AdminLTE App_ -->
 	<script src="./dist/js/adminlte.min.js"></script>
 </body>
-</body>
+</html>
